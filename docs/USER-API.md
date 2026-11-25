@@ -188,7 +188,7 @@ Revokes the session identified by the refresh-token cookie.
 
 - `500 Internal Server Error` — an unhandled database error.
 
-The controller attempts to clear the cookie. Because the clear operation omits the cookie's configured `/api/user` path, successful browser-side removal is **not confirmed**.
+The cookie service clears the cookie with its configured `/api` path and also expires the legacy `/api/user`-scoped cookie.
 
 ## `GET /logout-all`
 

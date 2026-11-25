@@ -99,12 +99,12 @@ The cookie service configures:
 | `HttpOnly` | `true` |
 | `Secure` | `true` in production; `false` otherwise |
 | `SameSite` | `strict` in production; `lax` otherwise |
-| `Path` | `/api/user` |
+| `Path` | `/api` |
 | Maximum age | 7 days |
 
-The Captain OTP endpoint uses the same cookie service, so its cookie also has `Path=/api/user`, not `/api/captain`.
+The shared `/api` path makes the cookie available to both `/api/user` and `/api/captain` routes.
 
-The clear-cookie operation does not pass the cookie's configured `Path`; browser removal of the `/api/user` cookie is therefore **not confirmed**.
+When setting or clearing the cookie, the service also expires the previous `/api/user`-scoped cookie to avoid stale duplicate cookies after this path change.
 
 ## CORS
 

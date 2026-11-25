@@ -26,4 +26,4 @@ This table lists status codes used by the mounted User and Captain controllers/m
 - Invalid or expired access-token verification errors in the User profile middleware are not converted to `401`; they are forwarded to the global error handler and currently default to `500`.
 - Mongoose validation, connection, and other unhandled errors have no explicit status mapping in the global error middleware and therefore normally become `500`.
 - Captain OTP email sending is not awaited by the registration controller, so email-delivery errors are not represented by a reliable API response.
-- Cookie clearing omits the configured cookie path. The endpoint may return success even though the browser does not remove the `/api/user` cookie.
+- Cookie set/clear operations use the shared `/api` path; the legacy `/api/user` cookie is also expired during set/clear.

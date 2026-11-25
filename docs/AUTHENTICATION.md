@@ -96,11 +96,11 @@ The plaintext refresh token is sent only in the HttpOnly cookie. The database st
 
 ## Cookie behavior
 
-The cookie is named `refreshToken`, is `HttpOnly`, has a seven-day `maxAge`, and uses `Path=/api/user`. `Secure` and `SameSite` vary by `NODE_ENV` as described in [API Overview](./API-OVERVIEW.md#refresh-token-cookie).
+The cookie is named `refreshToken`, is `HttpOnly`, has a seven-day `maxAge`, and uses `Path=/api`. `Secure` and `SameSite` vary by `NODE_ENV` as described in [API Overview](./API-OVERVIEW.md#refresh-token-cookie).
 
-Captain OTP verification also sets this cookie with `Path=/api/user`. The cookie is therefore not scoped to `/api/captain`.
+The shared `/api` path makes the cookie available to both User and Captain API prefixes. The service also clears any legacy `/api/user`-scoped cookie when setting or clearing the current cookie.
 
-The clear-cookie service omits the configured path when clearing the cookie. Whether the browser removes the cookie is **not confirmed**.
+Cookie clearing now uses the same path as cookie creation.
 
 ## Session revocation
 

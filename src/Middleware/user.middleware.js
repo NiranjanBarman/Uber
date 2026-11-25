@@ -76,7 +76,7 @@ const requireUserRefreshSession = async (req, res, next) => {
 
     const session = await sessionModel.findActiveByRefreshToken(decoded.userId, refreshToken);
     
-    if (!session) {
+    if (!session || session.role !== "user") {
         return res.status(401).json({
             message: "Unauthorized Access! Please Login"
         });
@@ -96,18 +96,24 @@ const userAccessSessionMiddleware = async (req, res, next) => {
         });
     }
 
-    const decoded = jwt.verify(accessToken, config.JWT_ACCESS_SECRET);
-    if(!decoded){
-        return res.status(401).json({
-            message: "Invalid Token"
-        });
+    let decoded;
+
+    try {
+        decoded = jwt.verify(accessToken, config.JWT_ACCESS_SECRET);
+    } catch (error) {
+        if (["JsonWebTokenError", "TokenExpiredError", "NotBeforeError"].includes(error.name)) {
+            return res.status(401).json({
+                message: "Invalid or Expired Token"
+            });
+        }
+        return next(error);
     }
 
-    console.log(decoded.userId);
-    console.log(decoded.sessionId);
-
-    const session = sessionModel.findOne({
-        _id: decoded.sessionId, user: decoded.userId 
+    const session = await sessionModel.findOne({
+        _id: decoded.sessionId,
+        user: decoded.userId,
+        revoked: false,
+        role: "user"
     });
 
     if(!session){

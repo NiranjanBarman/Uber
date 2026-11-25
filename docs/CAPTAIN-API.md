@@ -2,7 +2,7 @@
 
 Base URL: `http://localhost:3000/api/captain`
 
-Captain APIs are separate from User APIs. The only Captain endpoints currently mounted are registration and OTP verification. Captain login and protected Captain resource endpoints are **not implemented**.
+Captain APIs are separate from User APIs. Authentication endpoints include registration, OTP verification, login, refresh-token rotation, logout, and logout from all sessions.
 
 All endpoints have no path or query parameters.
 
@@ -116,7 +116,7 @@ Verifies the Captain's registration OTP, marks the Captain verified, creates a C
 
 **Authentication:** None  
 **Headers:** `Content-Type: application/json`  
-**Cookie:** On success, sets `refreshToken`; the cookie service configures `Path=/api/user`.
+**Cookie:** On success, sets `refreshToken` with `Path=/api`.
 
 ### Request body
 
@@ -174,9 +174,57 @@ Other fields from the Captain document may also be present. The access-token pay
 
 - `500 Internal Server Error` — unhandled database or token-generation error.
 
-## Not implemented
+## `GET /refresh-token`
 
-- Captain login route (although `captainLoginValid` and `comparePassword` exist)
-- Captain access-token/session middleware
-- Captain profile, logout, logout-all, or refresh-token routes
-- Ride, trip, vehicle-management, and payment APIs
+Rotates the refresh token for the current Captain session and returns a new access token.
+
+**Authentication:** Refresh-token cookie set by login or OTP verification.
+
+### Success — `200 OK`
+
+The response also sets the rotated `refreshToken` cookie.
+
+```json
+{
+  "message": "Access Token Generated Successfully!",
+  "accessToken": "<JWT access token>"
+}
+```
+
+### Errors
+
+- `401 Unauthorized` — refresh-token cookie is missing, invalid, expired, revoked, or does not belong to a Captain session.
+
+## `GET /logout`
+
+Revokes the session associated with the `refreshToken` cookie and clears that cookie.
+
+**Authentication:** Refresh-token cookie set by login or OTP verification.
+
+### Success — `200 OK`
+
+```json
+{ "message": "Logout Successfully!" }
+```
+
+### Errors
+
+- `401 Unauthorized` — refresh-token cookie is missing, invalid, expired, revoked, or does not belong to a Captain session.
+
+## `GET /logout-all`
+
+Revokes all active sessions for the Captain associated with the `refreshToken` cookie and clears that cookie.
+
+**Authentication:** Refresh-token cookie set by login or OTP verification.
+
+### Success — `200 OK`
+
+```json
+{ "message": "Logout from all sessions successfully!" }
+```
+
+### Errors
+
+- `401 Unauthorized` — refresh-token cookie is missing, invalid, expired, revoked, or does not belong to a Captain session.
+
+Ride, trip, vehicle-management, and payment APIs are not currently exposed as routes.
